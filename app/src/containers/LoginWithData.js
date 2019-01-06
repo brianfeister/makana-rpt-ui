@@ -44,7 +44,10 @@ const LoginMutation = props => {
   };
 
   return (
-    <Mutation mutation={LoginQuery}>
+    <Mutation
+      mutation={LoginQuery}
+      onCompleted={() => this.props.history.push('/')}
+    >
       {() => (
         <Login {...props} onSubmit={handleSubmit} />
       )}

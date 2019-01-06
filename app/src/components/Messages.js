@@ -17,7 +17,9 @@ const enhanced = compose(withStyles(styles));
 export default enhanced(({ classes }) => (
   <div className={classes.page}>
     <Typography variant="h4">
-      Profile
+      Messages
     </Typography>
+    <br />
+    <Typography>Private messages will show here.</Typography>
   </div>
 ));

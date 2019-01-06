@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { compose, withState } from 'recompose';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -19,6 +20,9 @@ const styles = theme => ({
   },
   input: {
     marginTop: 30,
+  },
+  signupText: {
+    padding: '0 20px 15px',
   },
   [theme.breakpoints.down('sm')]: {
     loginContainer: {
@@ -148,12 +152,24 @@ export default enhance(({
         </FormControl>
           <div>
             <br />
-            <Button disabled={loginLoading} type="submit" variant="contained" color="primary" className={classes.margin}>
+            <Button disabled={loginLoading} type="submit" variant="contained" color="primary">
             Log In
             </Button>
           </div>
         </form>
-
       </CardContent>
+      <Typography className={classes.signupText}>
+        Want to join the conversation?
+        &nbsp;&nbsp;
+        <Button
+          size="small"
+          variant="outlined"
+          className={classes.button}
+          component={Link}
+          to="/signup"
+        >
+          Sign Up
+        </Button>
+      </Typography>
     </Card>
 ));

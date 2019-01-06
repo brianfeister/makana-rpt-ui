@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { compose, withState } from 'recompose';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -19,6 +20,9 @@ const styles = theme => ({
   },
   input: {
     marginTop: 30,
+  },
+  loginText: {
+    padding: '0 20px 15px',
   },
   [theme.breakpoints.down('sm')]: {
     signupContainer: {
@@ -180,7 +184,19 @@ export default enhance(({
             </Button>
           </div>
         </form>
-
       </CardContent>
+      <Typography className={classes.loginText}>
+        Already registered?
+        &nbsp;&nbsp;
+        <Button
+          size="small"
+          variant="outlined"
+          className={classes.button}
+          component={Link}
+          to="/login"
+        >
+          Log In
+        </Button>
+      </Typography>
     </Card>
 ));
