@@ -40,7 +40,7 @@ const styles = theme => ({
   },
   drawer: {
     [theme.breakpoints.up('sm')]: {
-      width: drawerWidth,
+      marginLeft: drawerWidth/2,
       flexShrink: 0,
     },
   },
