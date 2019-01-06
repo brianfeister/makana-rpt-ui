@@ -35,6 +35,7 @@ const LoginMutation = props => {
       })
       .then(res => {
         sessionStorage.setItem('userToken', res.data.login.token);
+        props.history.push('/');
       })
       .catch( e => {
         return { errors: parseResponseError(e.graphQLErrors) };

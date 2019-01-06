@@ -8,6 +8,7 @@ import Input from '@material-ui/core/Input';
 import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Button from '@material-ui/core/Button';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const styles = theme => ({
   loginContainer: {
@@ -34,7 +35,8 @@ const enhance = compose(
   withStyles(styles),
   withState('formErrorEmail', 'setFormErrorEmail', null),
   withState('formErrorPassword', 'setFormErrorPassword', null),
-  withState('formErrorOther', 'setFormErrorOther', null)
+  withState('formErrorOther', 'setFormErrorOther', null),
+  withState('loginLoading', 'setLoginLoading', null),
 );
 
 export default enhance(({
@@ -48,12 +50,22 @@ export default enhance(({
   formErrorEmail,
   formErrorPassword,
   formErrorOther,
+  loginLoading,
 
   setFormErrorEmail,
   setFormErrorPassword,
   setFormErrorOther,
+  setLoginLoading
 }) => (
     <Card className={classes.loginContainer}>
+      { loginLoading &&
+        <LinearProgress />
+      }
+      { !loginLoading &&
+        /* quick hack to prevent visual offset when loading indicator shows */
+        <div style={{ height: 5 }} />
+      }
+
       <CardContent>
         <Typography variant="h5">
           Log In
@@ -65,6 +77,7 @@ export default enhance(({
             setFormErrorPassword(null);
             setFormErrorOther(null);
             if (onSubmit) {
+              setLoginLoading(true);
               onSubmit({
                 variables: {
                   email: e.target.email.value,
@@ -85,12 +98,14 @@ export default enhance(({
                         setFormErrorOther(error[1]);
                     }
                   }
+                  setLoginLoading(false);
                 }
               })
               .catch( e => {
                 if(e.errors) {
                   setFormErrorOther(e.errors);
                 }
+                setLoginLoading(false);
               });
             }
           }}
@@ -133,7 +148,7 @@ export default enhance(({
         </FormControl>
           <div>
             <br />
-            <Button type="submit" variant="contained" color="primary" className={classes.margin}>
+            <Button disabled={loginLoading} type="submit" variant="contained" color="primary" className={classes.margin}>
             Log In
             </Button>
           </div>

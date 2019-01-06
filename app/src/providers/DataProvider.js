@@ -20,6 +20,17 @@ const setAuth = (_, { isAuthenticated }, { cache }) => {
   return null;
 };
 
+const setSignupLoading = (_, { loading }, { cache }) => {
+  const data = {
+    signupState: {
+      __typename: 'UiState',
+      loading
+    },
+  };
+  cache.writeData({ data });
+  return null;
+};
+
 const WS_URL = 'ws://localhost:4000';
 const HTTP_URL = 'http://localhost:4000';
 
@@ -63,7 +74,8 @@ const stateLink = withClientState({
   cache,
   resolvers: {
     Mutation: {
-      setAuth
+      setAuth,
+      setSignupLoading,
     },
   },
   defaults: defaultState

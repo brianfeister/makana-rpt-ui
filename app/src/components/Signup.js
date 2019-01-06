@@ -8,6 +8,7 @@ import Input from '@material-ui/core/Input';
 import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Button from '@material-ui/core/Button';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const styles = theme => ({
   signupContainer: {
@@ -35,7 +36,8 @@ const enhance = compose(
   withState('formErrorName', 'setFormErrorName', null),
   withState('formErrorEmail', 'setFormErrorEmail', null),
   withState('formErrorPassword', 'setFormErrorPassword', null),
-  withState('formErrorOther', 'setFormErrorOther', null)
+  withState('formErrorOther', 'setFormErrorOther', null),
+  withState('signupLoading', 'setSignupLoading', null),
 );
 
 export default enhance(({
@@ -52,13 +54,23 @@ export default enhance(({
   formErrorEmail,
   formErrorPassword,
   formErrorOther,
+  signupLoading,
 
   setFormErrorName,
   setFormErrorEmail,
   setFormErrorPassword,
   setFormErrorOther,
+  setSignupLoading,
 }) => (
     <Card className={classes.signupContainer}>
+      { signupLoading &&
+        <LinearProgress />
+      }
+      { !signupLoading &&
+        /* quick hack to prevent visual offset when loading indicator shows */
+        <div style={{ height: 5 }} />
+      }
+
       <CardContent>
         <Typography variant="h5">
           Sign Up
@@ -71,6 +83,7 @@ export default enhance(({
             setFormErrorPassword(null);
             setFormErrorOther(null);
             if (onSubmit) {
+              setSignupLoading(true);
               onSubmit({
                 variables: {
                   name: e.target.name.value,
@@ -96,11 +109,13 @@ export default enhance(({
                     }
                   }
                 }
+                setSignupLoading(false);
               })
               .catch( e => {
                 if(e.errors) {
                   setFormErrorOther(e.errors);
                 }
+                setSignupLoading(false);
               });
             }
           }}
@@ -116,6 +131,7 @@ export default enhance(({
             name="name"
             defaultValue={name}
             required={true}
+            onChange={onNameChange}
           />
           <FormHelperText>
             {formErrorName}
@@ -159,7 +175,7 @@ export default enhance(({
         </FormControl>
           <div>
             <br />
-            <Button type="submit" variant="contained" color="primary" className={classes.margin}>
+            <Button disabled={signupLoading} type="submit" variant="contained" color="primary" className={classes.margin}>
             Sign Up
             </Button>
           </div>
