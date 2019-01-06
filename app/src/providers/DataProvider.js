@@ -11,8 +11,8 @@ import { withClientState } from 'apollo-link-state';
 
 const setAuth = (_, { isAuthenticated }, { cache }) => {
   const data = {
-    authStatus: {
-      __typename: 'AuthStatus',
+    auth: {
+      __typename: 'Auth',
       isAuthenticated
     },
   };
@@ -20,7 +20,6 @@ const setAuth = (_, { isAuthenticated }, { cache }) => {
   return null;
 };
 
-// TODO: via env configs
 const WS_URL = 'ws://localhost:4000';
 const HTTP_URL = 'http://localhost:4000';
 
@@ -41,7 +40,7 @@ const authLink = setContext((_, { headers }) => {
     return {
       headers: {
         ...headers,
-        authorization: token ? `Bearer ${token}` : "",
+        authorization: token ? `Bearer ${token}` : '',
       }
     }
   } else {
@@ -54,8 +53,8 @@ const authLink = setContext((_, { headers }) => {
 const cache = new InMemoryCache();
 
 const defaultState = {
-  authStatus: {
-    __typename: 'AuthStatus',
+  auth: {
+    __typename: 'Auth',
     isAuthenticated: !!sessionStorage.getItem('userToken'),
   }
 };
@@ -86,7 +85,7 @@ const client = new ApolloClient({
     stateLink,
     authLink,
     link
-        ])
+  ])
 });
 
 export default ({ children }) => (

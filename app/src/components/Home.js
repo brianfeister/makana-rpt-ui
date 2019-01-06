@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { compose } from 'recompose';
 import FeedData from '../containers/FeedData';
 import FeedSubscriptionData from '../containers/FeedSubscriptionData';
+import AuthState from '../containers/AuthState';
 import ListComments from './ListComments';
 import Notice from './Notice';
 
@@ -19,10 +20,17 @@ const enhanced = compose(withStyles(styles));
 
 export default enhanced(({ classes }) => (
   <div className={classes.page}>
-    <FeedSubscriptionData>
-      {props => <Notice {...props} />}
-    </FeedSubscriptionData>
-
+    <AuthState>
+      {({ isAuthenticated }) => (
+        <React.Fragment>
+          { isAuthenticated &&
+            <FeedSubscriptionData>
+              {props => <Notice {...props} />}
+            </FeedSubscriptionData>
+          }
+        </React.Fragment>
+      )}
+    </AuthState>
     <FeedData>{props => <ListComments {...props} />}</FeedData>
   </div>
 ));

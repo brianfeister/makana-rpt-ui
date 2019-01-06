@@ -10,7 +10,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Button from '@material-ui/core/Button';
 
 const styles = theme => ({
-  signupContainer: {
+  loginContainer: {
     margin: '250px auto 0 auto',
     width: '50%',
     maxWidth: 400,
@@ -20,7 +20,7 @@ const styles = theme => ({
     marginTop: 30,
   },
   [theme.breakpoints.down('sm')]: {
-    signupContainer: {
+    loginContainer: {
       margin: '50px auto 0 auto',
       width: '90%',
     },
@@ -32,7 +32,6 @@ const styles = theme => ({
 
 const enhance = compose(
   withStyles(styles),
-  withState('formErrorName', 'setFormErrorName', null),
   withState('formErrorEmail', 'setFormErrorEmail', null),
   withState('formErrorPassword', 'setFormErrorPassword', null),
   withState('formErrorOther', 'setFormErrorOther', null)
@@ -41,39 +40,33 @@ const enhance = compose(
 export default enhance(({
   classes,
   onSubmit,
-  name,
   email,
 
-  onNameChange,
   onEmailChange,
   onPasswordChange,
 
-  formErrorName,
   formErrorEmail,
   formErrorPassword,
   formErrorOther,
 
-  setFormErrorName,
   setFormErrorEmail,
   setFormErrorPassword,
   setFormErrorOther,
 }) => (
-    <Card className={classes.signupContainer}>
+    <Card className={classes.loginContainer}>
       <CardContent>
         <Typography variant="h5">
-          Sign Up
+          Log In
         </Typography>
         <form
           onSubmit={ e => {
             e.preventDefault();
-            setFormErrorName(null);
             setFormErrorEmail(null);
             setFormErrorPassword(null);
             setFormErrorOther(null);
             if (onSubmit) {
               onSubmit({
                 variables: {
-                  name: e.target.name.value,
                   email: e.target.email.value,
                   password: e.target.password.value
                 }
@@ -82,9 +75,6 @@ export default enhance(({
                 if(e.errors) {
                   for (let error of e.errors) {
                     switch(error[0]) {
-                      case 'name':
-                        setFormErrorName(error[1]);
-                      break;
                       case 'email':
                         setFormErrorEmail(error[1]);
                       break;
@@ -105,22 +95,6 @@ export default enhance(({
             }
           }}
         >
-        <FormControl
-          error={formErrorName !== null}
-          fullWidth
-          className={classes.input}
-        >
-          <Input
-            type="text"
-            placeholder="Name"
-            name="name"
-            defaultValue={name}
-            required={true}
-          />
-          <FormHelperText>
-            {formErrorName}
-          </FormHelperText>
-        </FormControl>
         <FormControl
           error={formErrorEmail !== null}
           fullWidth
@@ -160,7 +134,7 @@ export default enhance(({
           <div>
             <br />
             <Button type="submit" variant="contained" color="primary" className={classes.margin}>
-            Sign Up
+            Log In
             </Button>
           </div>
         </form>

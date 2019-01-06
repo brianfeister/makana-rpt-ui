@@ -6,18 +6,17 @@ import Signup from '../components/Signup';
 import SignupQuery from '../gqlqueries/Signup';
 import LoginQuery from '../gqlqueries/Login';
 
-const SIGNUP = SignupQuery;
-const LOGIN = LoginQuery;
-
+// @TODO - due to time constraints unlikely to figure out
+// GraphQL custom error classes server side
 const addErrorType = err => {
   switch(err.code) {
     case 3010:
       return ['email', 'A user with that email address already exists']
     default:
   }
-  // @KLUDGE - due to time constraints unlikely to figure out
-  // GraphQL custom error code handling
   switch(err.message) {
+    case 'A user with that email is already registered' :
+      return ['email', err.message];
     case 'Password must be at least 8 characters':
       return ['password', err.message];
     case 'Password cannot be empty':
@@ -39,9 +38,9 @@ const parseResponseError = errors => {
   return allErrors;
 };
 
-const SignupMutation = (props) => {
+const SignupMutation = props => {
   const { signupAction, loginAction } = props;
-  const handleSubmit = (data) => {
+  const handleSubmit = data => {
     if(data['variables']) {
       return signupAction({
         variables: data.variables
@@ -51,9 +50,8 @@ const SignupMutation = (props) => {
         loginAction({
           variables: data.variables
         })
-        .then(res => res.data.login)
-        .then(auth => {
-          sessionStorage.setItem('userToken', auth.token);
+        .then(res => {
+          sessionStorage.setItem('userToken', res.data.login.token);
         })
         .catch( e => {
           return {error: 'invalid user credentials'};
@@ -61,14 +59,14 @@ const SignupMutation = (props) => {
         props.onSubmit(true);
         return auth.user;
       })
-      .catch( error => {
-        return { errors: parseResponseError(error.graphQLErrors) };
+      .catch( e => {
+        return { errors: parseResponseError(e.graphQLErrors) };
       });
     }
   };
 
   return (
-    <Mutation mutation={SIGNUP}>
+    <Mutation mutation={SignupQuery}>
       {() => (
         <Signup {...props} onSubmit={handleSubmit} />
       )}
@@ -76,8 +74,7 @@ const SignupMutation = (props) => {
   );
 };
 
-
 export default compose(
-  graphql(SIGNUP, { name: 'signupAction' }),
-  graphql(LOGIN, { name: 'loginAction' })
+  graphql(SignupQuery, { name: 'signupAction' }),
+  graphql(LoginQuery, { name: 'loginAction' })
 )(SignupMutation);

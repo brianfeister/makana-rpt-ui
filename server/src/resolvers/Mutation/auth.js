@@ -10,23 +10,32 @@ const validateEmail = email => {
 
 const auth = {
   async signup(parent, args, ctx, info) {
-    const password = await bcrypt.hash(args.password, 10);
-    const user = await ctx.db.mutation.createUser({
-      data: { ...args, password }
-    });
+    const { name, email, password } = args;
+    const existingUser = await ctx.db.query.user({ where: { email } });
+    if (existingUser) {
+      throw new Error(`A user with that email is already registered`);
+    }
 
-    if (!args.email) {
+    if (!email) {
       throw new Error(`Email address is required`);
     }
-    if (!validateEmail(args.email)){
+    if (!validateEmail(email)){
       throw new Error(`Not a valid email address`);
     }
-    if (!args.password) {
+    if (!password) {
       throw new Error(`Password cannot be empty`)
     }
-    if (args.password.length < 8) {
+    if (password.length < 8) {
       throw new Error(`Password must be at least 8 characters`)
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await ctx.db.mutation.createUser({
+      data: {
+        ...args,
+        password: hashedPassword
+      }
+    });
 
     return {
       token: jwt.sign(
@@ -40,7 +49,7 @@ const auth = {
   async login(parent, { email, password }, ctx, info) {
     const user = await ctx.db.query.user({ where: { email } });
     if (!user) {
-      throw new Error(`No such user found for email: ${email}`);
+      throw new Error(`No user with that email address`);
     }
 
     const valid = await bcrypt.compare(password, user.password);
