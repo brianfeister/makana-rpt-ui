@@ -1,40 +1,43 @@
 import React from 'react';
 import { graphql, Mutation } from 'react-apollo';
-import gql from 'graphql-tag';
-import Signup from '../components/Signup';
 import { compose } from 'react-apollo';
 
-const SIGN_UP = gql`
-    mutation signup($name: String!, $email: String!, $password: String!){
-      signup(name: $name email: $email password: $password) {
-        user {
-          id
-          name
-          email
-        }
-      }
-    }
-`;
+import Signup from '../components/Signup';
+import SignupQuery from '../gqlqueries/Signup';
+import LoginQuery from '../gqlqueries/Login';
 
-const LOGIN = gql`
-    mutation login($email: String!, $password: String!){
-      login(email: $email, password: $password){
-        token
-        user {
-          id
-          name
-          email
-        }
+const SIGNUP = SignupQuery;
+const LOGIN = LoginQuery;
 
-      }
-      setAuth (isAuthenticated: true) @client {
-        authStatus {
-          isAuthenticated
-        }
-      }
+const addErrorType = err => {
+  switch(err.code) {
+    case 3010:
+      return ['email', 'A user with that email address already exists']
+    default:
+  }
+  // @KLUDGE - due to time constraints unlikely to figure out
+  // GraphQL custom error code handling
+  switch(err.message) {
+    case 'Password must be at least 8 characters':
+      return ['password', err.message];
+    case 'Password cannot be empty':
+      return ['password', err.message];
+    case 'Email address is required':
+      return ['email', err.message];
+    case 'Not a valid email address':
+      return ['email', err.message];
+    default:
+      return ['unknown', 'An unknown error has occurred'];
+  }
+};
 
-    }
-`;
+const parseResponseError = errors => {
+  let allErrors = [];
+  for(let error of errors) {
+    allErrors.push(addErrorType(error));
+  }
+  return allErrors;
+};
 
 const SignupMutation = (props) => {
   const { signupAction, loginAction } = props;
@@ -43,31 +46,29 @@ const SignupMutation = (props) => {
       return signupAction({
         variables: data.variables
       })
-      .then(res => (res.data))
-      .then(data => (data.signup))
+      .then(res => res.data.signup)
       .then(auth => {
         loginAction({
           variables: data.variables
         })
-        .then(res => (res.data))
-        .then(data => (data.login))
+        .then(res => res.data.login)
         .then(auth => {
           sessionStorage.setItem('userToken', auth.token);
         })
-        .catch((e)=>{
+        .catch( e => {
           return {error: 'invalid user credentials'};
         });
         props.onSubmit(true);
         return auth.user;
       })
       .catch( error => {
-        console.log('TODO: handle graphql errors')
+        return { errors: parseResponseError(error.graphQLErrors) };
       });
     }
   };
 
   return (
-    <Mutation mutation={SIGN_UP}>
+    <Mutation mutation={SIGNUP}>
       {() => (
         <Signup {...props} onSubmit={handleSubmit} />
       )}
@@ -77,6 +78,6 @@ const SignupMutation = (props) => {
 
 
 export default compose(
-  graphql(SIGN_UP, { name: 'signupAction' }),
+  graphql(SIGNUP, { name: 'signupAction' }),
   graphql(LOGIN, { name: 'loginAction' })
 )(SignupMutation);
