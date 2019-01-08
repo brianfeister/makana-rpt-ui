@@ -8,7 +8,7 @@ const Subscription = {
       const query =
         userId === -1
           ? { isPublic: true }
-          : { author: { id: userId } };
+          : { OR: [{ author: { id: userId } }, { isPublic: true } ] };
       return ctx.db.subscription.comment(
         {
           where: {
