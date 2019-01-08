@@ -7,11 +7,7 @@ export default gql`
       isPublic
       message
       createdAt
-      author {
-        id
-        email
-        name
-      }
+      author { id }
     }
   }
 `;
