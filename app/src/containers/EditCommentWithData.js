@@ -1,5 +1,5 @@
 import React from 'react';
-import { graphql, Mutation } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import { compose } from 'react-apollo';
 
 import EditComment from '../components/EditComment';

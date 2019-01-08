@@ -4,17 +4,12 @@ import { compose } from 'react-apollo';
 
 import Compose from '../components/Compose';
 import NewCommentQuery from '../gqlqueries/NewComment';
-import DeleteCommentQuery from '../gqlqueries/DeleteComment';
 
 const NewMessageMutation = props => {
   const {
-    id,
     author,
-    editing,
 
     newCommentAction,
-    deleteCommentAction,
-    refetch,
   } = props;
 
   const handleSubmit = data => {
@@ -23,8 +18,7 @@ const NewMessageMutation = props => {
         variables: data.variables
       })
       .then(res => {
-        console.log('Comment edit res!!!', res)
-        refetch();
+        console.log('Comment edit res', res)
       })
       .catch( e => {
 
