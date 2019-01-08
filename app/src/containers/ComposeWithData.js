@@ -36,6 +36,11 @@ const LoginMutation = props => {
       .then(res => {
         sessionStorage.setItem('userToken', res.data.login.token);
         sessionStorage.setItem('user', JSON.stringify(res.data.login.user));
+        // @TODO this should work but itmermittently fails
+        // I believe it may be related to the container pattern
+        // and the fact that props is being called here from the
+        // parent and interrupting the childs lifecycle
+        props.history.push('/');
       })
       .catch( e => {
         return { errors: parseResponseError(e.graphQLErrors) };
