@@ -9,25 +9,29 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { setContext } from 'apollo-link-context';
 import { withClientState } from 'apollo-link-state';
 
-const setAuth = (_, { isAuthenticated }, { cache }) => {
+const setAuth = (_, props, { cache }) => {
+  const { isAuthenticated, user } = props;
   const data = {
-    authStatus: {
-      __typename: 'AuthStatus',
-      isAuthenticated
+    auth: {
+      __typename: 'Auth',
+      isAuthenticated,
+      user,
     },
   };
   cache.writeData({ data });
   return null;
 };
 
-// TODO: via env configs
 const WS_URL = 'ws://localhost:4000';
 const HTTP_URL = 'http://localhost:4000';
 
 const wsLink = new WebSocketLink({
   uri: WS_URL,
   options: {
-    reconnect: true
+    reconnect: true,
+    connectionParams: {
+      Authorization : sessionStorage.getItem('userToken') ? `Bearer ${sessionStorage.getItem('userToken')}` : '',
+    }
   }
 });
 
@@ -41,7 +45,7 @@ const authLink = setContext((_, { headers }) => {
     return {
       headers: {
         ...headers,
-        authorization: token ? `Bearer ${token}` : "",
+        authorization: token ? `Bearer ${token}` : '',
       }
     }
   } else {
@@ -54,9 +58,10 @@ const authLink = setContext((_, { headers }) => {
 const cache = new InMemoryCache();
 
 const defaultState = {
-  authStatus: {
-    __typename: 'AuthStatus',
+  auth: {
+    __typename: 'Auth',
     isAuthenticated: !!sessionStorage.getItem('userToken'),
+    user: JSON.parse(sessionStorage.getItem('user')) || null,
   }
 };
 
@@ -64,7 +69,7 @@ const stateLink = withClientState({
   cache,
   resolvers: {
     Mutation: {
-      setAuth
+      setAuth,
     },
   },
   defaults: defaultState
@@ -86,7 +91,7 @@ const client = new ApolloClient({
     stateLink,
     authLink,
     link
-        ])
+  ])
 });
 
 export default ({ children }) => (

@@ -14,7 +14,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import AuthState from '../containers/AuthState';
 
 const styles = theme => ({
-  signupContainer: {
+  loginContainer: {
     margin: '250px auto 0 auto',
     width: '50%',
     maxWidth: 400,
@@ -23,11 +23,11 @@ const styles = theme => ({
   input: {
     marginTop: 30,
   },
-  loginText: {
+  signupText: {
     padding: '0 20px 15px',
   },
   [theme.breakpoints.down('sm')]: {
-    signupContainer: {
+    loginContainer: {
       margin: '50px auto 0 auto',
       width: '90%',
     },
@@ -39,75 +39,68 @@ const styles = theme => ({
 
 const enhance = compose(
   withStyles(styles),
-  withState('formErrorName', 'setFormErrorName', null),
   withState('formErrorEmail', 'setFormErrorEmail', null),
   withState('formErrorPassword', 'setFormErrorPassword', null),
   withState('formErrorOther', 'setFormErrorOther', null),
-  withState('signupLoading', 'setSignupLoading', null),
+  withState('loginLoading', 'setLoginLoading', null),
 );
 
 export default enhance(({
   classes,
   onSubmit,
-  name,
   email,
 
-  onNameChange,
   onEmailChange,
   onPasswordChange,
 
-  formErrorName,
   formErrorEmail,
   formErrorPassword,
   formErrorOther,
-  signupLoading,
+  loginLoading,
 
-  setFormErrorName,
   setFormErrorEmail,
   setFormErrorPassword,
   setFormErrorOther,
-  setSignupLoading,
+  setLoginLoading
 }) => (
-  <React.Fragment>
-    <AuthState>
-      {({ isAuthenticated }) => (
-        <React.Fragment>
-          { isAuthenticated &&
+    <React.Fragment>
+      <AuthState>
+        {({ isAuthenticated }) => (
+          <React.Fragment>
+            { isAuthenticated &&
 
-            <Redirect
-              to={{
-                pathname: '/'
-              }}
-            />
-          }
-        </React.Fragment>
-      )}
-    </AuthState>
-    <Card className={classes.signupContainer}>
-      { signupLoading &&
+              <Redirect
+                to={{
+                  pathname: '/'
+                }}
+              />
+            }
+          </React.Fragment>
+        )}
+      </AuthState>
+      <Card className={classes.loginContainer}>
+      { loginLoading &&
         <LinearProgress />
       }
-      { !signupLoading &&
+      { !loginLoading &&
         /* quick hack to prevent visual offset when loading indicator shows */
         <div style={{ height: 5 }} />
       }
 
       <CardContent>
         <Typography variant="h5">
-          Sign Up
+          Log In
         </Typography>
         <form
           onSubmit={ e => {
             e.preventDefault();
-            setFormErrorName(null);
             setFormErrorEmail(null);
             setFormErrorPassword(null);
             setFormErrorOther(null);
             if (onSubmit) {
-              setSignupLoading(true);
+              setLoginLoading(true);
               onSubmit({
                 variables: {
-                  name: e.target.name.value,
                   email: e.target.email.value,
                   password: e.target.password.value
                 }
@@ -116,9 +109,6 @@ export default enhance(({
                 if(e.errors) {
                   for (let error of e.errors) {
                     switch(error[0]) {
-                      case 'name':
-                        setFormErrorName(error[1]);
-                      break;
                       case 'email':
                         setFormErrorEmail(error[1]);
                       break;
@@ -129,35 +119,18 @@ export default enhance(({
                         setFormErrorOther(error[1]);
                     }
                   }
+                  setLoginLoading(false);
                 }
-                setSignupLoading(false);
               })
               .catch( e => {
                 if(e.errors) {
                   setFormErrorOther(e.errors);
                 }
-                setSignupLoading(false);
+                setLoginLoading(false);
               });
             }
           }}
         >
-        <FormControl
-          error={formErrorName !== null}
-          fullWidth
-          className={classes.input}
-        >
-          <Input
-            type="text"
-            placeholder="Name"
-            name="name"
-            defaultValue={name}
-            required={true}
-            onChange={onNameChange}
-          />
-          <FormHelperText>
-            {formErrorName}
-          </FormHelperText>
-        </FormControl>
         <FormControl
           error={formErrorEmail !== null}
           fullWidth
@@ -196,25 +169,25 @@ export default enhance(({
         </FormControl>
           <div>
             <br />
-            <Button disabled={signupLoading} type="submit" variant="contained" color="primary" className={classes.margin}>
-            Sign Up
+            <Button disabled={loginLoading} type="submit" variant="contained" color="primary">
+            Log In
             </Button>
           </div>
         </form>
       </CardContent>
-      <Typography className={classes.loginText}>
-        Already registered?
+      <Typography className={classes.signupText}>
+        Want to join the conversation?
         &nbsp;&nbsp;
         <Button
           size="small"
           variant="outlined"
           className={classes.button}
           component={Link}
-          to="/login"
+          to="/signup"
         >
-          Log In
+          Sign Up
         </Button>
       </Typography>
-    </Card>
-  </React.Fragment>
+      </Card>
+    </React.Fragment>
 ));
