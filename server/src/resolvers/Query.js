@@ -1,8 +1,9 @@
 const { getUserId, getUserIdOptional, AuthError } = require('../utils');
 
 const Query = {
-  feed(parent, args, ctx, info) {
+  async feed(parent, args, ctx, info) {
     const userId = getUserIdOptional(ctx);
+    let parentIds = [];
 
     const where =
       userId === -1
@@ -11,7 +12,7 @@ const Query = {
 
     return ctx.db.query.comments(
       {
-        where,
+        where: where,
         orderBy: 'createdAt_DESC'
       },
       info

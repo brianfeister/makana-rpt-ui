@@ -1,15 +1,15 @@
 import React, { Fragment } from 'react';
 import Comment from '../containers/CommentWithData';
-import { compose, lifecycle } from 'recompose';
+import { compose } from 'recompose';
 import renderWhileLoading from '../utils/renderWhileLoading';
 
-const ListComments = props => {
+const ReplyListComments = props => {
   const { comments } = props;
   return (
     <Fragment>
       {comments &&
         comments.map(comment => {
-          return <Comment key={comment.id} {...comment} />
+          return <Comment isChild={true} key={comment.id} parentCommentId={comment.parent.id} {...comment} />
         })}
     </Fragment>
   );
@@ -17,9 +17,4 @@ const ListComments = props => {
 
 export default compose(
   renderWhileLoading,
-  lifecycle({
-    componentDidMount() {
-      this.props.subscribeToNewComments();
-    }
-  }),
-)(ListComments);
+)(ReplyListComments);

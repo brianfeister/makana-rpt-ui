@@ -9,22 +9,13 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { setContext } from 'apollo-link-context';
 import { withClientState } from 'apollo-link-state';
 
-const setAuth = (_, { isAuthenticated }, { cache }) => {
+const setAuth = (_, props, { cache }) => {
+  const { isAuthenticated, user } = props;
   const data = {
     auth: {
       __typename: 'Auth',
-      isAuthenticated
-    },
-  };
-  cache.writeData({ data });
-  return null;
-};
-
-const setSignupLoading = (_, { loading }, { cache }) => {
-  const data = {
-    signupState: {
-      __typename: 'UiState',
-      loading
+      isAuthenticated,
+      user,
     },
   };
   cache.writeData({ data });
@@ -37,7 +28,10 @@ const HTTP_URL = 'http://localhost:4000';
 const wsLink = new WebSocketLink({
   uri: WS_URL,
   options: {
-    reconnect: true
+    reconnect: true,
+    connectionParams: {
+      Authorization : sessionStorage.getItem('userToken') ? `Bearer ${sessionStorage.getItem('userToken')}` : '',
+    }
   }
 });
 
@@ -67,6 +61,7 @@ const defaultState = {
   auth: {
     __typename: 'Auth',
     isAuthenticated: !!sessionStorage.getItem('userToken'),
+    user: JSON.parse(sessionStorage.getItem('user')) || null,
   }
 };
 
@@ -75,7 +70,6 @@ const stateLink = withClientState({
   resolvers: {
     Mutation: {
       setAuth,
-      setSignupLoading,
     },
   },
   defaults: defaultState

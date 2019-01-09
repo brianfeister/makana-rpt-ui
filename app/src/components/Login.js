@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, Redirect } from 'react-router-dom';
 import { compose, withState } from 'recompose';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -10,6 +11,8 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
+import AuthState from '../containers/AuthState';
+
 const styles = theme => ({
   loginContainer: {
     margin: '250px auto 0 auto',
@@ -19,6 +22,9 @@ const styles = theme => ({
   },
   input: {
     marginTop: 30,
+  },
+  signupText: {
+    padding: '0 20px 15px',
   },
   [theme.breakpoints.down('sm')]: {
     loginContainer: {
@@ -57,7 +63,22 @@ export default enhance(({
   setFormErrorOther,
   setLoginLoading
 }) => (
-    <Card className={classes.loginContainer}>
+    <React.Fragment>
+      <AuthState>
+        {({ isAuthenticated }) => (
+          <React.Fragment>
+            { isAuthenticated &&
+
+              <Redirect
+                to={{
+                  pathname: '/'
+                }}
+              />
+            }
+          </React.Fragment>
+        )}
+      </AuthState>
+      <Card className={classes.loginContainer}>
       { loginLoading &&
         <LinearProgress />
       }
@@ -148,12 +169,25 @@ export default enhance(({
         </FormControl>
           <div>
             <br />
-            <Button disabled={loginLoading} type="submit" variant="contained" color="primary" className={classes.margin}>
+            <Button disabled={loginLoading} type="submit" variant="contained" color="primary">
             Log In
             </Button>
           </div>
         </form>
-
       </CardContent>
-    </Card>
+      <Typography className={classes.signupText}>
+        Want to join the conversation?
+        &nbsp;&nbsp;
+        <Button
+          size="small"
+          variant="outlined"
+          className={classes.button}
+          component={Link}
+          to="/signup"
+        >
+          Sign Up
+        </Button>
+      </Typography>
+      </Card>
+    </React.Fragment>
 ));

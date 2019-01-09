@@ -35,7 +35,7 @@ const LoginMutation = props => {
       })
       .then(res => {
         sessionStorage.setItem('userToken', res.data.login.token);
-        props.history.push('/');
+        sessionStorage.setItem('user', JSON.stringify(res.data.login.user));
       })
       .catch( e => {
         return { errors: parseResponseError(e.graphQLErrors) };
@@ -44,7 +44,10 @@ const LoginMutation = props => {
   };
 
   return (
-    <Mutation mutation={LoginQuery}>
+    <Mutation
+      mutation={LoginQuery}
+      onCompleted={() => this.props.history.push('/')}
+    >
       {() => (
         <Login {...props} onSubmit={handleSubmit} />
       )}

@@ -6,8 +6,18 @@ export default gql`
       mutation
       node {
         id
+        author {
+          id
+          email
+          name
+        }
+        isPublic
+        createdAt
         message
         updatedAt
+        parent {
+          id
+        }
       }
       previousValues {
         id

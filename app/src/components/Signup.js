@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, Redirect } from 'react-router-dom';
 import { compose, withState } from 'recompose';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -10,6 +11,8 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
+import AuthState from '../containers/AuthState';
+
 const styles = theme => ({
   signupContainer: {
     margin: '250px auto 0 auto',
@@ -19,6 +22,9 @@ const styles = theme => ({
   },
   input: {
     marginTop: 30,
+  },
+  loginText: {
+    padding: '0 20px 15px',
   },
   [theme.breakpoints.down('sm')]: {
     signupContainer: {
@@ -62,6 +68,21 @@ export default enhance(({
   setFormErrorOther,
   setSignupLoading,
 }) => (
+  <React.Fragment>
+    <AuthState>
+      {({ isAuthenticated }) => (
+        <React.Fragment>
+          { isAuthenticated &&
+
+            <Redirect
+              to={{
+                pathname: '/'
+              }}
+            />
+          }
+        </React.Fragment>
+      )}
+    </AuthState>
     <Card className={classes.signupContainer}>
       { signupLoading &&
         <LinearProgress />
@@ -180,7 +201,20 @@ export default enhance(({
             </Button>
           </div>
         </form>
-
       </CardContent>
+      <Typography className={classes.loginText}>
+        Already registered?
+        &nbsp;&nbsp;
+        <Button
+          size="small"
+          variant="outlined"
+          className={classes.button}
+          component={Link}
+          to="/login"
+        >
+          Log In
+        </Button>
+      </Typography>
     </Card>
+  </React.Fragment>
 ));
