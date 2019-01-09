@@ -1,26 +1,9 @@
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import { compose, withProps, toRenderProps } from 'recompose';
-
-const query = gql`
-  subscription {
-    feedSubscription {
-      mutation
-      node {
-        id
-        message
-        updatedAt
-      }
-      previousValues {
-        id
-        message
-      }
-    }
-  }
-`;
+import FeedSubscriptionQuery from '../gqlqueries/FeedSubscription';
 
 const enhanced = compose(
-  graphql(query),
+  graphql(FeedSubscriptionQuery),
   withProps(({ data: { feedSubscription } }) => {
     if (!feedSubscription) {
       return;
