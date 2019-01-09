@@ -20,6 +20,8 @@ export default enhanced(({ classes }) => (
       Messages
     </Typography>
     <br />
-    <Typography>Private messages will show here.</Typography>
+    <Typography>Private messages would show here.</Typography>
+      <br />
+    <Typography>(Not implemented due to time constraints) </Typography>
   </div>
 ));

@@ -1,13 +1,18 @@
+const { getUserIdOptional } = require('../utils');
+
 const Subscription = {
   feedSubscription: {
     subscribe: (parent, args, ctx, info) => {
-      // TODO: handle authenticated subscriptions
+      const userId = getUserIdOptional(ctx);
+
+      const query =
+        userId === -1
+          ? { isPublic: true }
+          : { OR: [{ author: { id: userId } }, { isPublic: true } ] };
       return ctx.db.subscription.comment(
         {
           where: {
-            node: {
-              isPublic: true
-            }
+            node: query
           }
         },
         info

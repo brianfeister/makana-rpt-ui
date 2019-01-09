@@ -16,10 +16,10 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import theme from './theme';
 
 const App = () => (
-  <BrowserRouter>
-    <CssBaseline>
-      <DataProvider>
-        <MuiThemeProvider theme={theme}>
+  <CssBaseline>
+    <DataProvider>
+      <MuiThemeProvider theme={theme}>
+        <BrowserRouter>
           <AuthState>
             {({ isAuthenticated }) => (
               <React.Fragment>
@@ -75,10 +75,10 @@ const App = () => (
               </React.Fragment>
             )}
           </AuthState>
-        </MuiThemeProvider>
-      </DataProvider>
-    </CssBaseline>
-  </BrowserRouter>
+        </BrowserRouter>
+      </MuiThemeProvider>
+    </DataProvider>
+  </CssBaseline>
 );
 
 export default App;

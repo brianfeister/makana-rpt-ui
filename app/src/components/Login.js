@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { compose, withState } from 'recompose';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -10,6 +10,8 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
+
+import AuthState from '../containers/AuthState';
 
 const styles = theme => ({
   loginContainer: {
@@ -61,7 +63,22 @@ export default enhance(({
   setFormErrorOther,
   setLoginLoading
 }) => (
-    <Card className={classes.loginContainer}>
+    <React.Fragment>
+      <AuthState>
+        {({ isAuthenticated }) => (
+          <React.Fragment>
+            { isAuthenticated &&
+
+              <Redirect
+                to={{
+                  pathname: '/'
+                }}
+              />
+            }
+          </React.Fragment>
+        )}
+      </AuthState>
+      <Card className={classes.loginContainer}>
       { loginLoading &&
         <LinearProgress />
       }
@@ -171,5 +188,6 @@ export default enhance(({
           Sign Up
         </Button>
       </Typography>
-    </Card>
+      </Card>
+    </React.Fragment>
 ));

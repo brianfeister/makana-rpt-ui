@@ -52,7 +52,7 @@ const SignupMutation = props => {
         })
         .then(res => {
           sessionStorage.setItem('userToken', res.data.login.token);
-          props.history.push('/');
+          sessionStorage.setItem('user', JSON.stringify(res.data.login.user));
         })
         .catch( e => {
           return {error: 'invalid user credentials'};

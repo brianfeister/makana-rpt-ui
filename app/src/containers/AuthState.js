@@ -4,12 +4,16 @@ import ClientLoggedInQuery from '../gqlqueries/ClientLoggedIn';
 
 const enhanced = compose(
   graphql(ClientLoggedInQuery,{
-    props: ({ data : { auth }}) => ({
-      isAuthenticated: auth && sessionStorage.getItem('userToken') && auth.isAuthenticated
-    })
+    props: ({ data : { auth }}) => {
+      return ({
+        isAuthenticated: auth && sessionStorage.getItem('userToken') && auth.isAuthenticated,
+        user: auth && sessionStorage.getItem('user') && auth.user,
+        userObj: auth && sessionStorage.getItem('user')
+      })
+    }
   }),
   withProps(({ auth, setAuth } ) => ({
-    auth
+    auth,
   }))
 );
 

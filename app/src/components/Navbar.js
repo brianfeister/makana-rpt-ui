@@ -219,7 +219,7 @@ export default enhanced(({
               paper: classes.drawerPaper,
             }}
             variant="permanent"
-            open
+            open={!mobileOpen}
           >
             <InnerDrawer />
           </Drawer>
