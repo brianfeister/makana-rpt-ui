@@ -30,7 +30,7 @@ export default enhance(({
   author,
 
   label,
-  rows = 1,
+  rows,
   buttonText = 'Post',
   parentCommentId,
   noReplyToggle,
