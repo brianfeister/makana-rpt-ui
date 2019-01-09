@@ -7,6 +7,23 @@ export default gql`
       isPublic
       message
       createdAt
+      children {
+        id
+        isPublic
+        message
+        createdAt
+        author {
+          id
+          email
+          name
+        }
+        parent {
+          id
+        }
+      }
+      parent {
+        id
+      }
       author {
         id
         email

@@ -18,6 +18,7 @@ const enhance = compose(
   withStyles(styles),
   withState('commentSaving', 'setCommentSaving', null),
   withState('isPublicState', 'setIsPublicState', ({ showInitally }) => showInitally),
+  withState('isReplying', 'setIsReplying', false),
 );
 
 export default enhance(({
@@ -28,12 +29,24 @@ export default enhance(({
   message,
   author,
 
+  label,
+  rows = 1,
+  buttonText = 'Post',
+  parentCommentId,
+  noReplyToggle,
+  postNewComment,
+
   onCommentSave,
+  onCommentEdit,
+
   commentSaving,
   isPublicState,
+  isReplying,
+  editing,
 
   setCommentSaving,
   setIsPublicState,
+  setIsReplying,
 
   setEditing,
 }) => {
@@ -47,95 +60,133 @@ export default enhance(({
       <form
         className={classes.composeForm}
         onSubmit={ e => {
-          debugger;
           e.preventDefault();
           if (onCommentSave) {
             setCommentSaving(true);
             let variables;
+            // add new reply to existing comment
+            if (parentCommentId) {
+              variables = {
+                id: author.id.replace('User:', ''),
+                isPublic: isPublicState === undefined ? false : isPublicState,
+                message: e.target.message.value,
+                children: [],
+                parentCommentId: parentCommentId,
+              }
             // edit existing comments
-            if (id !== undefined) {
+            } else if (id !== undefined) {
               variables = {
                 id: id,
                 isPublic: isPublicState === undefined ? isPublic : isPublicState,
                 message: e.target.message.value,
+                parent: null,
               }
-            // create new comments, stripping `id` key
+            // create new comments
             } else {
               variables = {
                 id: author.id.replace('User:', ''),
                 isPublic: isPublicState === undefined ? false : isPublicState,
                 message: e.target.message.value,
+                children: [],
               }
             }
-            onCommentSave({
-              variables
-            })
-            .then(() => {
-              setCommentSaving(false);
-              setEditing(false);
-            })
-            .catch( e => {
-              setCommentSaving(false);
-            });
+            if (postNewComment) {
+              onCommentSave({
+                variables
+              })
+              .then(() => {
+                setCommentSaving(false);
+                setEditing(false);
+                setIsReplying(false);
+              })
+              .catch( e => {
+                setCommentSaving(false);
+              });
+            } else {
+              onCommentEdit({
+                variables
+              })
+              .then(() => {
+                setCommentSaving(false);
+                setEditing(false);
+                setIsReplying(false);
+              })
+              .catch( e => {
+                setCommentSaving(false);
+              });
+            }
           }
         }}
       >
-
-      <FormControl
-        fullWidth
-        className={classes.input}
-      >
-        <TextField
-          id="filled-textarea"
-          multiline
-          className={classes.textField}
-          margin="normal"
-          variant="filled"
-          name="message"
-          defaultValue={message}
-          required={true}
-          fullWidth
-        />
-        { commentSaving &&
-          <LinearProgress style={{ marginTop: -8 }} />
-        }
-        { !commentSaving &&
-          /* quick hack to prevent visual offset when loading indicator shows */
-          <div style={{ height: 5, marginTop: -8 }} />
-        }
-      </FormControl>
-
-      <FormControl
-        className={classes.input}
-      >
-      <FormControlLabel control={
-        <Switch
-          label="Public Comment"
-          onChange={handleSwitchChange}
-          checked={isPublicState}
-          name="isPublic"
-          disabled={isPublic}
-          color="primary"
-        />
-        } label="Public Comment" />
-      </FormControl>
-
-      <div>
-        <Button disabled={commentSaving} type="submit" variant="contained" size="small" color="primary">
-         Save
+      { !editing && !noReplyToggle && !isReplying &&
+        <Button
+          size="small"
+          onClick={() => setIsReplying(true)}
+        >
+          + Add a Comment
         </Button>
-        &nbsp;&nbsp;
-        { setEditing &&
-          <Button
-            onClick={() => {
-              setEditing(false);
-            }}
-            disabled={commentSaving}
-            size="small" >
-           Cancel
-          </Button>
-        }
-      </div>
+      }
+      { (editing || noReplyToggle || isReplying) &&
+        <React.Fragment>
+          <FormControl
+            fullWidth
+            className={classes.input}
+          >
+            <TextField
+              id="filled-textarea"
+              multiline
+              className={classes.textField}
+              margin="normal"
+              variant="filled"
+              name="message"
+              defaultValue={message}
+              required={true}
+              label={label}
+              rows={rows}
+              fullWidth
+            />
+            { commentSaving &&
+              <LinearProgress style={{ marginTop: -8 }} />
+            }
+            { !commentSaving &&
+              /* quick hack to prevent visual offset when loading indicator shows */
+              <div style={{ height: 5, marginTop: -8 }} />
+            }
+          </FormControl>
+          <FormControl
+            className={classes.input}
+          >
+          <FormControlLabel control={
+            <Switch
+              label="Public Comment"
+              onChange={handleSwitchChange}
+              checked={isPublicState}
+              name="isPublic"
+              disabled={isPublic}
+              color="primary"
+            />
+            } label="Public Comment" />
+          </FormControl>
+
+          <div>
+            <Button disabled={commentSaving} type="submit" variant="contained" size="small" color="primary">
+             {buttonText}
+            </Button>
+            &nbsp;&nbsp;
+            { setEditing &&
+              <Button
+                onClick={() => {
+                  setEditing(false);
+                  setIsReplying(false);
+                }}
+                disabled={commentSaving}
+                size="small" >
+               Cancel
+              </Button>
+            }
+          </div>
+        </React.Fragment>
+      }
       </form>
     </React.Fragment>
   );

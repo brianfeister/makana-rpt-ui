@@ -6,6 +6,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
+import Divider from '@material-ui/core/Divider';
 
 import PublicIcon from '@material-ui/icons/Public';
 import LockIcon from '@material-ui/icons/Lock';
@@ -13,6 +14,7 @@ import LockIcon from '@material-ui/icons/Lock';
 import AuthState from '../containers/AuthState';
 import EditComment from '../containers/EditCommentWithData';
 import Compose from '../components/Compose';
+import ReplyListComments from '../components/ReplyListComments';
 
 const styles = theme => ({
   card: {
@@ -23,8 +25,22 @@ const styles = theme => ({
       flexShrink: 0,
     },
   },
+  cardChild: {
+    marginTop: theme.spacing.unit,
+    width: 360,
+    boxShadow: 'none',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      flexShrink: 0,
+    },
+  },
   commentCard: {
     position: 'relative',
+  },
+  commentCardChild: {
+    position: 'relative',
+    paddingLeft: 0,
+    paddingRight: 0,
   },
   avatar: {
     float: 'left',
@@ -57,7 +73,8 @@ const enhanced = compose(
   withState('editing', 'setEditing', false),
 );
 
-export default enhanced(({
+export default enhanced(props => {
+  const {
     classes,
 
     id,
@@ -65,34 +82,34 @@ export default enhanced(({
     author,
     message,
     createdAt,
+    children,
 
     editing,
     commentMsg,
+    isChild,
 
-    refetch,
     setEditing,
     setCommentMsg,
-    onDeleteClick,
     onCommentSave,
-  }) => {
+    onCommentEdit,
+  } = props;
+
   return (
-  <Card className={classes.card}>
-    <CardContent className={classes.commentCard}>
+  <Card className={isChild ? classes.cardChild : classes.card}>
+    <CardContent className={isChild ? classes.commentCardChild : classes.commentCard}>
       <AuthState>
         {({ isAuthenticated, user }) => {
           const userCanEdit = isAuthenticated &&
-            user.id.replace('User:','')
-            ===
-            author.id;
+            user.id.replace('User:','') === author.id;
           return (
             <React.Fragment>
               { userCanEdit &&
                 <EditComment
                   author={author}
                   id={id}
+                  commentEdit={true}
                   isPublic={isPublic}
                   message={message}
-                  refetch={refetch}
                   editing={editing}
                   commentMsg={commentMsg}
                   setEditing={setEditing}
@@ -121,11 +138,17 @@ export default enhanced(({
         }
 
       </Typography>
-      { !editing &&
+      { !editing && !isChild &&
         <Typography variant="h5" component="h2">
           {message}
         </Typography>
       }
+      { !editing && isChild &&
+        <Typography>
+          {message}
+        </Typography>
+      }
+
       { editing &&
         <Compose
           id={id}
@@ -134,9 +157,37 @@ export default enhanced(({
           isPublic={isPublic}
           message={message}
           onCommentSave={onCommentSave}
-          refetch={refetch}
+          onCommentEdit={onCommentEdit}
           setEditing={setEditing}
+          editing={editing}
         />
+      }
+      { !isChild && children && children.length > 0 &&
+        <React.Fragment>
+          <br />
+          <Divider light />
+          <br />
+          <ReplyListComments isChild={true} comments={children} {...props} />
+        </React.Fragment>
+      }
+      { !isChild &&
+        <AuthState>
+          {({ user }) => (
+            <Compose
+              author={user}
+              id={id}
+              showInitally={isPublic}
+              key={`${id}${isPublic}`}
+              isPublic={isPublic}
+              onCommentSave={onCommentSave}
+              onCommentEdit={onCommentEdit}
+              setEditing={setEditing}
+              buttonText="Reply"
+              parentCommentId={id}
+              postNewComment={true}
+            />
+          )}
+        </AuthState>
       }
     </CardContent>
   </Card>

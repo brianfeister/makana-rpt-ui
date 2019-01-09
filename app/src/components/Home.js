@@ -13,7 +13,22 @@ const styles = theme => ({
   page: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    paddingBottom: 250,
+  },
+  composeContainer: {
+    height: 210,
+    width: 400,
+    //position: 'fixed',
+    top: 70,
+    left: 0,
+    backgroundColor: 'black',
+    padding: '0 15px 15px',
+    marginTop: -70,
+    border: '1px solid #4e4e4e',
+    [theme.breakpoints.down('sm')]: {
+      marginLeft: 0,
+    },
   }
 });
 
@@ -27,6 +42,9 @@ export default enhanced(({ classes }) => (
           <React.Fragment>
             { isAuthenticated &&
               <React.Fragment>
+              <div className={classes.composeContainer}>
+                <NewMessage noReplyToggle={true} author={user} />
+              </div>
               <FeedSubscriptionData>
                 { props => (
                   <React.Fragment>
@@ -37,17 +55,12 @@ export default enhanced(({ classes }) => (
                   </React.Fragment>
                 )}
               </FeedSubscriptionData>
-              <NewMessage author={user} />
               </React.Fragment>
             }
             { !isAuthenticated &&
-              <FeedSubscriptionData>
-                { props => (
-                  <React.Fragment>
-                    <FeedData subscriptionProps={props}>{props => <ListComments {...props} />}</FeedData>
-                  </React.Fragment>
-                )}
-              </FeedSubscriptionData>
+              <React.Fragment>
+                <FeedData>{props => <ListComments {...props} />}</FeedData>
+              </React.Fragment>
             }
           </React.Fragment>
         )}

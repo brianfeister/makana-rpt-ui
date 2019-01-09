@@ -15,6 +15,9 @@ export default gql`
         createdAt
         message
         updatedAt
+        parent {
+          id
+        }
       }
       previousValues {
         id
