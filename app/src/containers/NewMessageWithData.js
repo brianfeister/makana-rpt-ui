@@ -8,6 +8,7 @@ import NewCommentQuery from '../gqlqueries/NewComment';
 const NewMessageMutation = props => {
   const {
     author,
+    noReplyToggle,
 
     newCommentAction,
   } = props;
@@ -18,10 +19,10 @@ const NewMessageMutation = props => {
         variables: data.variables
       })
       .then(res => {
-        console.log('Comment edit res', res)
+        console.log('Comment edit res', res);
       })
       .catch( e => {
-
+        console.log('ERR!', e);
       });
     }
   };
@@ -32,6 +33,10 @@ const NewMessageMutation = props => {
         <Compose
           onCommentSave={handleSubmit}
           author={author}
+          noReplyToggle={noReplyToggle}
+          rows={3}
+          label={'Post a Comment'}
+          postNewComment={true}
         />
       )}
     </Mutation>

@@ -7,7 +7,8 @@ const enhanced = compose(
     props: ({ data : { auth }}) => {
       return ({
         isAuthenticated: auth && sessionStorage.getItem('userToken') && auth.isAuthenticated,
-        user: auth && sessionStorage.getItem('user') && auth.user
+        user: auth && sessionStorage.getItem('user') && auth.user,
+        userObj: auth && sessionStorage.getItem('user')
       })
     }
   }),
